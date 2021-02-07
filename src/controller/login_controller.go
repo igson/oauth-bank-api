@@ -1,16 +1,13 @@
 package controller
 
 import (
-	"fmt"
 	"net/http"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/igson/banking/src/autenticacao"
-	"github.com/igson/banking/src/domain/models"
-	"github.com/igson/banking/src/errors"
-	"github.com/igson/banking/src/interfaces"
+	"github.com/igson/oauth-bank-api/src/domain/dto"
+	"github.com/igson/oauth-bank-api/src/errors"
+	"github.com/igson/oauth-bank-api/src/interfaces"
 )
 
 type LoginController interface {
@@ -18,11 +15,11 @@ type LoginController interface {
 }
 
 type loginController struct {
-	service interfaces.IUserService
+	service interfaces.IAuthService
 }
 
 //NewLoginController construtor pra injeção das dependências
-func NewLoginController(userService interfaces.IUserService) LoginController {
+func NewLoginController(userService interfaces.IAuthService) LoginController {
 	return &loginController{
 		service: userService,
 	}
@@ -30,36 +27,21 @@ func NewLoginController(userService interfaces.IUserService) LoginController {
 
 func (c *loginController) Login(ctx *gin.Context) {
 
-	login := models.Login{}
+	request := dto.LoginRequest{}
 
-	if err := ctx.ShouldBindJSON(&login); err != nil {
-		erroMessage := errors.NewBadRequestError("invalid json error body")
+	if err := ctx.ShouldBindJSON(&request); err != nil {
+		erroMessage := errors.NewBadRequestError("erro de formato JSON")
 		ctx.JSON(erroMessage.StatusCode, erroMessage)
 		return
 	}
 
-	if loginErr := c.service.Login(login.Username, login.Password); loginErr != nil {
-		ctx.JSON(loginErr.StatusCode, loginErr)
-		return
-	}
-
-	id, erro := strconv.Atoi(login.Username)
-
-	if erro != nil {
-		restErr := errors.NewBadRequestError("Username ID deve ser número")
-		ctx.JSON(restErr.StatusCode, restErr)
-		return
-	}
-
-	fmt.Println("ID informado:", id)
-
-	token, tokenErr := autenticacao.CriarToken(uint64(id))
+	tokenString, tokenErr := c.service.Login(request)
 
 	if tokenErr != nil {
 		ctx.JSON(tokenErr.StatusCode, tokenErr)
 		return
 	}
 
-	ctx.JSON(http.StatusOK, token)
+	ctx.JSON(http.StatusOK, tokenString)
 
 }

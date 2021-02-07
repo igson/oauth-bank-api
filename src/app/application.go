@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/igson/banking/src/errors"
+	"github.com/igson/oauth-bank-api/src/errors"
 )
 
 //StartApplication - dá início a aplicação
@@ -14,7 +14,7 @@ func StartApplication() {
 		panic(erro.Message)
 	} else {
 		rota := GerarRotas()
-		rota.Run(":8080")
+		rota.Run(":8081")
 	}
 
 }

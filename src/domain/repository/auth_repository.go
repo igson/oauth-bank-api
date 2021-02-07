@@ -6,9 +6,9 @@ import (
 
 	"github.com/jmoiron/sqlx"
 
-	"github.com/igson/banking/src/domain/models"
-	"github.com/igson/banking/src/errors"
-	"github.com/igson/banking/src/interfaces"
+	"github.com/igson/oauth-bank-api/src/domain/models"
+	"github.com/igson/oauth-bank-api/src/errors"
+	"github.com/igson/oauth-bank-api/src/interfaces"
 )
 
 const (
@@ -26,22 +26,21 @@ func NewUserRepository(dbClient *sqlx.DB) interfaces.IUserRepository {
 	}
 }
 
-func (u *userRepository) Login(usuario string, senha string) *errors.RestErroAPI {
+func (u *userRepository) Login(usuario string, senha string) (*models.Login, *errors.RestErroAPI) {
 
-	var l models.Login
+	var login models.Login
 
-	err := u.client.Get(&l, queryLoginUser, usuario, senha)
+	err := u.client.Get(&login, queryLoginUser, usuario, senha)
 
 	if err != nil {
 		if err == sql.ErrNoRows {
 			fmt.Println(err.Error())
-			return errors.NewNotFoundErro("Usuário ou seha inválido")
+			return nil, errors.NewNotFoundErro("Usuário ou seha inválido")
 		} else {
 			fmt.Println(err.Error())
-			return errors.NewUnexpectedError("Unexpected database error")
 		}
 	}
 
-	return nil
+	return &login, nil
 
 }

@@ -5,7 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/igson/banking/src/middlewares"
+	"github.com/igson/oauth-bank-api/src/middlewares"
 )
 
 /* var clienteController = controller.NewClienteController(service.NewClienteService())
@@ -31,18 +31,14 @@ type Rota struct {
 func Configurar(r *gin.Engine) *gin.Engine {
 	//rotas := rotasAccounts
 	var rotas []Rota
-	rotas = append(rotas, rotasCustomer...)
-	rotas = append(rotas, rotasLogin...)
-	//func(httpMethod string, relativePath string, handlers ...gin.HandlerFunc) gin.IRoutes
+	rotas = append(rotasLogin)
 
-	//func (h *Handler) Me(c *gin.Context) {}
-	// g.GET("/me", middleware.AuthUser(h.TokenService), h.Me)
-	//func AuthUser(s model.TokenService) gin.HandlerFunc { middleware
 	r.Use(middlewares.Logger())
+
 	for _, rota := range rotas {
 
 		if rota.RequerAutenticacao {
-			r.Handle(rota.Metodo, rota.URI, middlewares.Autenticar(), rota.Funcao)
+			r.Handle(rota.Metodo, rota.URI, rota.Funcao)
 			fmt.Println(fmt.Sprintf("Rota %s requer autenticação", rota.Name))
 		} else {
 			r.Handle(rota.Metodo, rota.URI, rota.Funcao)

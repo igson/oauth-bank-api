@@ -3,22 +3,22 @@ package routers
 import (
 	"net/http"
 
-	"github.com/igson/banking/src/controller"
-	"github.com/igson/banking/src/datasources/banking"
-	"github.com/igson/banking/src/domain/repository"
-	"github.com/igson/banking/src/domain/service"
+	"github.com/igson/oauth-bank-api/src/controller"
+	"github.com/igson/oauth-bank-api/src/datasources/banking"
+	"github.com/igson/oauth-bank-api/src/domain/repository"
+	"github.com/igson/oauth-bank-api/src/domain/service"
 )
 
 var (
 	repo            = repository.NewUserRepository(banking.GetDbClient())
-	uService        = service.NewUserService(repo)
-	loginController = controller.NewLoginController(uService)
+	authService     = service.NewAuthService(repo)
+	loginController = controller.NewLoginController(authService)
 )
 
 var rotasLogin = []Rota{
 
 	{
-		URI:                "/login",
+		URI:                "/oauth/login",
 		Metodo:             http.MethodPost,
 		Funcao:             loginController.Login,
 		RequerAutenticacao: false,
