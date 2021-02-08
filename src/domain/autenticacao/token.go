@@ -1,6 +1,8 @@
 package autenticacao
 
 import (
+	"encoding/json"
+	"fmt"
 	"log"
 	"time"
 
@@ -15,8 +17,8 @@ const (
 	HMAC_SAMPLE_SECRET = "hmacSampleSecret"
 )
 
-type Token struct {
-	Username string `json:"usernameId"`
+type Claims struct {
+	Username string `json:"username"`
 	Expiry   int64  `json:"exp"`
 	Role     string `json:"role"`
 }
@@ -39,10 +41,41 @@ func GerarToken(login models.Login) (*string, *errors.RestErroAPI) {
 
 }
 
+func BuildClaimsFromJwtMapClaims(mapClaims jwt.MapClaims) (*Claims, error) {
+
+	bytes, err := json.Marshal(mapClaims)
+
+	if err != nil {
+		return nil, err
+	}
+
+	var c Claims
+
+	err = json.Unmarshal(bytes, &c)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &c, nil
+
+}
+
+func (c *Claims) IsRequestVerifiedWithTokenClaims(urlParams map[string]string) bool {
+	fmt.Println("User Name Claims ----> ", c.Username)
+	fmt.Println("Router Name MAPS ----> ", urlParams["routeName"])
+	fmt.Println("User Name MAPS ----> ", urlParams["username"])
+	fmt.Println("User Type ----> ", c.Role)
+	if c.Username != urlParams["username"] {
+		return false
+	}
+	return true
+}
+
 func claimsForUser(login models.Login) jwt.MapClaims {
 	return jwt.MapClaims{
-		"usernameId": login.Username,
-		"role":       login.Role,
-		"exp":        time.Now().Add(TOKEN_DURATION).Unix(),
+		"username": login.Username,
+		"role":     login.Role,
+		"exp":      time.Now().Add(TOKEN_DURATION).Unix(),
 	}
 }

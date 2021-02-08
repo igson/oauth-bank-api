@@ -4,8 +4,6 @@ import (
 	"fmt"
 
 	"github.com/gin-gonic/gin"
-
-	"github.com/igson/oauth-bank-api/src/middlewares"
 )
 
 /* var clienteController = controller.NewClienteController(service.NewClienteService())
@@ -33,7 +31,7 @@ func Configurar(r *gin.Engine) *gin.Engine {
 	var rotas []Rota
 	rotas = append(rotasLogin)
 
-	r.Use(middlewares.Logger())
+	//r.Use(middlewares.Logger())
 
 	for _, rota := range rotas {
 

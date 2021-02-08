@@ -7,4 +7,5 @@ import (
 
 type IAuthService interface {
 	Login(login dto.LoginRequest) (*string, *errors.RestErroAPI)
+	Verify(urlParams map[string]string) (bool, *errors.RestErroAPI)
 }

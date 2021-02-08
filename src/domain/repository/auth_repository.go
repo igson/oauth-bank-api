@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	queryLoginUser = "SELECT * FROM users WHERE username = ? and password = ?"
+	queryLoginUser = "SELECT username, role FROM users WHERE username = ? and password = ?"
 )
 
 type userRepository struct {
@@ -29,7 +29,7 @@ func NewUserRepository(dbClient *sqlx.DB) interfaces.IUserRepository {
 func (u *userRepository) Login(usuario string, senha string) (*models.Login, *errors.RestErroAPI) {
 
 	var login models.Login
-
+	fmt.Printf("Usuário: %s e Senha: %s", usuario, senha)
 	err := u.client.Get(&login, queryLoginUser, usuario, senha)
 
 	if err != nil {
